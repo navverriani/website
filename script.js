@@ -127,6 +127,90 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- Canvas star field ---
+    const starCanvas = document.getElementById('star-canvas');
+    if (starCanvas) {
+        const ctx = starCanvas.getContext('2d');
+        const stars = [];
+
+        const resizeCanvas = () => {
+            starCanvas.width = window.innerWidth;
+            starCanvas.height = window.innerHeight;
+        };
+
+        // Generate star data once
+        for (let i = 0; i < 300; i++) {
+            const r = Math.random();
+            stars.push({
+                x: Math.random(),
+                y: Math.pow(Math.random(), 0.65) * 0.75,
+                size: r < 0.7 ? 0.5 + Math.random() * 0.5 : r < 0.92 ? 1 + Math.random() * 0.8 : 1.8 + Math.random() * 1.2,
+                phase: Math.random() * Math.PI * 2,
+                speed: 0.3 + Math.random() * 0.8,
+                baseAlpha: 0.3 + Math.random() * 0.7
+            });
+        }
+
+        const drawStars = (time) => {
+            if (document.documentElement.getAttribute('data-theme') !== 'dark') {
+                ctx.clearRect(0, 0, starCanvas.width, starCanvas.height);
+                requestAnimationFrame(drawStars);
+                return;
+            }
+
+            ctx.clearRect(0, 0, starCanvas.width, starCanvas.height);
+
+            for (const star of stars) {
+                const twinkle = Math.sin(time * 0.001 * star.speed + star.phase);
+                const alpha = star.baseAlpha * (0.4 + 0.6 * (0.5 + 0.5 * twinkle));
+                const x = star.x * starCanvas.width;
+                const y = star.y * starCanvas.height;
+
+                // Glow for larger stars
+                if (star.size > 1.2) {
+                    const glow = ctx.createRadialGradient(x, y, 0, x, y, star.size * 4);
+                    glow.addColorStop(0, 'rgba(255,255,255,' + (alpha * 0.35) + ')');
+                    glow.addColorStop(1, 'transparent');
+                    ctx.beginPath();
+                    ctx.arc(x, y, star.size * 4, 0, Math.PI * 2);
+                    ctx.fillStyle = glow;
+                    ctx.fill();
+                }
+
+                // Star core
+                ctx.beginPath();
+                ctx.arc(x, y, star.size, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255,255,255,' + alpha + ')';
+                ctx.fill();
+            }
+
+            requestAnimationFrame(drawStars);
+        };
+
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        requestAnimationFrame(drawStars);
+    }
+
+    // --- Theme toggle ---
+    const themeToggle = document.getElementById('theme-toggle');
+
+    // Remove no-transition class after initial paint
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            document.documentElement.classList.remove('no-transition');
+        });
+    });
+
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const newTheme = isDark ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    }
+
     // --- Hero entrance animation ---
     const heroEls = document.querySelectorAll('.hero-label, .hero-name, .hero-tagline, .hero-bio, .social-links');
     heroEls.forEach((el, i) => {

@@ -9,10 +9,40 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script>
+        (function() {
+            var saved = localStorage.getItem('theme');
+            if (saved) {
+                document.documentElement.setAttribute('data-theme', saved);
+            } else {
+                var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                var h = new Date().getHours();
+                if (prefersDark || h >= 20 || h < 7) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            }
+            document.documentElement.classList.add('no-transition');
+        })();
+    </script>
 </head>
 <body>
     <!-- Sky decorations -->
     <div class="sky-scene" aria-hidden="true">
+        <canvas id="star-canvas"></canvas>
+        <svg class="moon-svg" viewBox="0 0 100 100" width="90" height="90">
+            <defs>
+                <linearGradient id="moon-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#faf5e4"/>
+                    <stop offset="50%" stop-color="#ede5c8"/>
+                    <stop offset="100%" stop-color="#d8d0b0"/>
+                </linearGradient>
+                <mask id="crescent">
+                    <circle cx="50" cy="50" r="45" fill="white"/>
+                    <circle cx="66" cy="40" r="37" fill="black"/>
+                </mask>
+            </defs>
+            <circle cx="50" cy="50" r="45" fill="url(#moon-grad)" mask="url(#crescent)"/>
+        </svg>
         <div class="sun"></div>
         <div class="sun-rays"></div>
         <div class="cloud cloud-1"></div>
@@ -34,11 +64,6 @@
     <nav class="nav" id="nav">
         <div class="nav-container">
             <a href="#" class="nav-name">Davyd Naveriani</a>
-            <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
             <ul class="nav-links" id="nav-links">
                 <li><a href="#news">News</a></li>
                 <li><a href="#research">Research</a></li>
@@ -48,6 +73,15 @@
                 <li><a href="#hackathons">Hackathons</a></li>
                 <li><a href="#blog">Blog</a></li>
             </ul>
+            <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+                <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            </button>
+            <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
         </div>
     </nav>
 
